@@ -2,7 +2,7 @@ import { $CombinedState } from "@reduxjs/toolkit";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom"
-import { addLocker } from '../../locker/userLocker'
+import { addLocker, deleteLocker } from '../../locker/userLocker'
 
 // 영화 소개 페이지
 function Contents(props) {
@@ -14,18 +14,22 @@ function Contents(props) {
     let data = props.data.find(function (x) {
         return x.id == id
     });
+    // 버튼 스위치
+    let [click, setClick] = useState(false);
     let locker = state.locker;
-    // locker 보관함에 (현재 url의 id를 가진 객체의) title값
+    // locker 보관함과 data(현재 상세페이지의 영화)의 title이 일치
     let result = locker.find(e => e.title === data.title)
     useEffect(() => {
         // 보관함에 저장되어있는 해당 영화 유무에 따른 버튼 스타일
         let $addLocker = document.getElementById('addLocker');
-        if(result) {
-            $addLocker.style.background =  '#F82F62'
+        if (result) {
+            $addLocker.style.background = '#F82F62'
             $addLocker.value = '보관함에 저장됨'
+            setClick(true)
         } else {
             $addLocker.style.background = '#000'
             $addLocker.value = '보관함에 저장하기'
+            setClick(false)
         }
     }, [])
 
@@ -45,10 +49,19 @@ function Contents(props) {
                     <div className="contetnsScreen_btn">
                         <input id="addLocker" type="button" onClick={(e) => {
                             //보관함 저장
-                            dispatch(addLocker(data));
-                            e.target.style.background =  '#F82F62';
-                            e.target.value = '보관함에 저장됨'
+                            setClick(!click)
+                            console.log(click)
+                            if (click) {
+                                dispatch(deleteLocker(data))
+                                e.target.style.background = '#000'
+                                e.target.value = '보관함에 저장하기'
+                            } else if (!click == true) {
+                                dispatch(addLocker(data));
+                                e.target.style.background = '#F82F62'
+                                e.target.value = '보관함에 저장됨'
+                            }
                         }}>
+
                             {/* <svg width="18px" height="18px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2a.75.75 0 0 0-.75.75v8.5h-8.5a.75.75 0 0 0 0 1.5h8.5v8.5a.75.75 0 0 0 1.5 0v-8.5h8.5a.75.75 0 0 0 0-1.5h-8.5v-8.5A.75.75 0 0 0 12 2Z" fill="currentColor"></path></svg> */}
                         </input>
                     </div>
