@@ -1,4 +1,3 @@
-import { $CombinedState } from "@reduxjs/toolkit";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom"
@@ -8,6 +7,8 @@ import { addLocker, deleteLocker } from '../../locker/userLocker'
 function Contents(props) {
     // URL 파라미터 
     let { id } = useParams();
+    let adress = window.location.href;
+    console.log('현재 주소 : ' + adress)
     // redux
     let state = useSelector((state) => state);
     let dispatch = useDispatch();
@@ -32,6 +33,18 @@ function Contents(props) {
             setClick(false)
         }
     }, [])
+
+    useEffect(()=>{
+        // 최근 본 작품 localStorage (data의 img)저장하기 
+        let recent =  localStorage.getItem('watched')
+        recent = JSON.parse(recent) //object 형태로 전환
+        console.log('recent' + recent)
+        recent.push({id:data.id, title:data.title, img:data.img, url:adress})
+        // 중복되는 객체 값 제거하기 -> Set으로 중복 제거된 recent를 다시 배열 형태로 저장 
+        recent = Array.from(new Set(recent.map(JSON.stringify))).map(JSON.parse)
+        // 접속한 페이지의 영화 데이터 (id, title, img, url주소) 저장
+        localStorage.setItem('watched', JSON.stringify(recent))
+    },[])
 
     return (
         <>
@@ -61,8 +74,6 @@ function Contents(props) {
                                 e.target.value = '보관함에 저장됨'
                             }
                         }}>
-
-                            {/* <svg width="18px" height="18px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2a.75.75 0 0 0-.75.75v8.5h-8.5a.75.75 0 0 0 0 1.5h8.5v8.5a.75.75 0 0 0 1.5 0v-8.5h8.5a.75.75 0 0 0 0-1.5h-8.5v-8.5A.75.75 0 0 0 12 2Z" fill="currentColor"></path></svg> */}
                         </input>
                     </div>
                 </div>
